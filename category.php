@@ -10,10 +10,11 @@ include 'header.php';
         <div class="col-md-3">
             <div class="list-group">
                 <a href="#" class="list-group-item list-group-item-action active" id="filter-all">All</a>
-                <a href="#" class="list-group-item list-group-item-action" data-category="Shirts">Shirts</a>
-                <a href="#" class="list-group-item list-group-item-action" data-category="Pants">Pants</a>
-                <a href="#" class="list-group-item list-group-item-action" data-category="Accessories">Accessories</a>
-                <a href="#" class="list-group-item list-group-item-action" data-category="Shoes">Shoes</a>
+                <?php
+                foreach ($categories as $category) {
+                    echo '<a href="#" class="list-group-item list-group-item-action" data-category="' . htmlspecialchars($category['name']) . '">' . htmlspecialchars($category['name']) . '</a>';
+                }
+                ?>
             </div>
         </div>
 
@@ -22,7 +23,7 @@ include 'header.php';
                 <?php
                 foreach ($products as $id => $product) {
                     echo '
-                    <div class="col-md-4 mb-4 product-item" data-category="' . $product['category'] . '">
+                    <div class="col-md-4 mb-4 product-item" data-category="' . $product['category_name'] . '">
                         <div class="card">
                             <img src="' . $product['image'] . '" class="card-img-top" alt="' . $product['name'] . '">
                             <div class="card-body">

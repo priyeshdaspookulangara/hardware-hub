@@ -1,5 +1,7 @@
 <?php
-session_start();
+if (session_status() === PHP_SESSION_NONE) {
+    session_start();
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -25,6 +27,9 @@ session_start();
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="category.php">Products</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="admin.php">Admin</a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">
