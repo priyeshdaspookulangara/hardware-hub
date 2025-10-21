@@ -15,13 +15,13 @@ if (!$product) {
     <div class="row">
         <div class="col-md-6">
             <div class="position-relative">
-                <img src="<?php echo $product['image']; ?>" class="img-fluid" alt="<?php echo $product['name']; ?>">
+                <img src="<?php echo $product['images'][0]; ?>" class="img-fluid" id="main-product-image" alt="<?php echo $product['name']; ?>">
                 <span class="badge bg-primary position-absolute top-0 start-0 m-3">New Arrival</span>
             </div>
             <div class="text-center mt-3">
-                <span class="dot"></span>
-                <span class="dot"></span>
-                <span class="dot"></span>
+                <?php foreach ($product['images'] as $index => $image) {
+                    echo '<span class="dot' . ($index == 0 ? ' active' : '') . '" data-image="' . $image . '"></span>';
+                } ?>
             </div>
         </div>
         <div class="col-md-6">
@@ -86,6 +86,13 @@ $(document).ready(function() {
         $('.color-swatch').removeClass('selected');
         $(this).addClass('selected');
         selectedColor = $(this).data('color');
+    });
+
+    $('.dot').on('click', function() {
+        $('.dot').removeClass('active');
+        $(this).addClass('active');
+        var newImage = $(this).data('image');
+        $('#main-product-image').attr('src', newImage);
     });
 
     $('#add-to-cart-btn').on('click', function() {
