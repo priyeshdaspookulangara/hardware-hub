@@ -1,0 +1,27 @@
+CREATE DATABASE IF NOT EXISTS hardware_hub;
+USE hardware_hub;
+
+CREATE TABLE categories (
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL UNIQUE
+);
+
+CREATE TABLE products (
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    brand VARCHAR(255) NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    original_price DECIMAL(10, 2) NOT NULL,
+    images TEXT NOT NULL,
+    category_id INT(11) UNSIGNED NOT NULL,
+    description TEXT NOT NULL,
+    sizes VARCHAR(255) NOT NULL,
+    colors VARCHAR(255) NOT NULL,
+    FOREIGN KEY (category_id) REFERENCES categories(id)
+);
+
+CREATE TABLE users (
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+);

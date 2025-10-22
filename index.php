@@ -1,5 +1,5 @@
 <?php
-include 'products.php';
+include 'db_connect.php';
 include 'header.php';
 ?>
 
@@ -74,17 +74,21 @@ include 'header.php';
     <h2 class="text-center mb-4">Featured Products</h2>
     <div class="row">
         <?php
-        $featured_products = array_slice($products, 0, 6, true);
-        foreach ($featured_products as $id => $product) {
+        $stmt = $conn->prepare("SELECT * FROM products LIMIT 6");
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($row = $result->fetch_assoc()) {
+            $images = json_decode($row['images'], true);
+            $first_image = !empty($images) ? $images[0] : 'https://via.placeholder.com/300';
             echo '
             <div class="col-md-4 mb-4">
                 <div class="card product-card">
-                    <img src="' . $product['image'] . '" class="card-img-top" alt="' . $product['name'] . '">
+                    <img src="' . $first_image . '" class="card-img-top" alt="' . $row['name'] . '">
                     <div class="card-body">
-                        <h5 class="card-title">' . $product['name'] . '</h5>
-                        <p class="card-text">' . $product['brand'] . '</p>
-                        <p class="card-text"><strong>$' . $product['price'] . '</strong> <s class="text-muted">$' . $product['original_price'] . '</s></p>
-                        <a href="product.php?id=' . $id . '" class="btn btn-primary">View Details</a>
+                        <h5 class="card-title">' . $row['name'] . '</h5>
+                        <p class="card-text">' . $row['brand'] . '</p>
+                        <p class="card-text"><strong>$' . $row['price'] . '</strong> <s class="text-muted">$' . $row['original_price'] . '</s></p>
+                        <a href="product.php?id=' . $row['id'] . '" class="btn btn-primary">View Details</a>
                     </div>
                     <div class="product-card-overlay">
                         <a href="#" class="btn btn-secondary btn-sm"><i class="fas fa-eye"></i> Quick View</a>
@@ -146,16 +150,20 @@ include 'header.php';
         <div class="tab-pane fade show active" id="new-arrivals" role="tabpanel" aria-labelledby="new-arrivals-tab">
             <div class="row mt-3">
                 <?php
-                $new_arrivals = array_slice($products, 0, 3, true);
-                foreach ($new_arrivals as $id => $product) {
+                $stmt = $conn->prepare("SELECT * FROM products ORDER BY id DESC LIMIT 3");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                while ($row = $result->fetch_assoc()) {
+                    $images = json_decode($row['images'], true);
+                    $first_image = !empty($images) ? $images[0] : 'https://via.placeholder.com/300';
                     echo '
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="' . $product['image'] . '" class="card-img-top" alt="' . $product['name'] . '">
+                            <img src="' . $first_image . '" class="card-img-top" alt="' . $row['name'] . '">
                             <div class="card-body">
-                                <h5 class="card-title">' . $product['name'] . '</h5>
-                                <p class="card-text">' . $product['brand'] . '</p>
-                                <p class="card-text"><strong>$' . $product['price'] . '</strong></p>
+                                <h5 class="card-title">' . $row['name'] . '</h5>
+                                <p class="card-text">' . $row['brand'] . '</p>
+                                <p class="card-text"><strong>$' . $row['price'] . '</strong></p>
                             </div>
                         </div>
                     </div>
@@ -167,16 +175,20 @@ include 'header.php';
         <div class="tab-pane fade" id="top-rated" role="tabpanel" aria-labelledby="top-rated-tab">
             <div class="row mt-3">
                 <?php
-                $top_rated = array_slice($products, 3, 3, true);
-                foreach ($top_rated as $id => $product) {
+                $stmt = $conn->prepare("SELECT * FROM products ORDER BY price DESC LIMIT 3");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                while ($row = $result->fetch_assoc()) {
+                    $images = json_decode($row['images'], true);
+                    $first_image = !empty($images) ? $images[0] : 'https://via.placeholder.com/300';
                     echo '
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="' . $product['image'] . '" class="card-img-top" alt="' . $product['name'] . '">
+                            <img src="' . $first_image . '" class="card-img-top" alt="' . $row['name'] . '">
                             <div class="card-body">
-                                <h5 class="card-title">' . $product['name'] . '</h5>
-                                <p class="card-text">' . $product['brand'] . '</p>
-                                <p class="card-text"><strong>$' . $product['price'] . '</strong></p>
+                                <h5 class="card-title">' . $row['name'] . '</h5>
+                                <p class="card-text">' . $row['brand'] . '</p>
+                                <p class="card-text"><strong>$' . $row['price'] . '</strong></p>
                             </div>
                         </div>
                     </div>
@@ -188,16 +200,20 @@ include 'header.php';
         <div class="tab-pane fade" id="best-deals" role="tabpanel" aria-labelledby="best-deals-tab">
             <div class="row mt-3">
                 <?php
-                $best_deals = array_slice($products, 6, 3, true);
-                foreach ($best_deals as $id => $product) {
+                $stmt = $conn->prepare("SELECT * FROM products ORDER BY original_price - price DESC LIMIT 3");
+                $stmt->execute();
+                $result = $stmt->get_result();
+                while ($row = $result->fetch_assoc()) {
+                    $images = json_decode($row['images'], true);
+                    $first_image = !empty($images) ? $images[0] : 'https://via.placeholder.com/300';
                     echo '
                     <div class="col-md-4 mb-4">
                         <div class="card">
-                            <img src="' . $product['image'] . '" class="card-img-top" alt="' . $product['name'] . '">
+                            <img src="' . $first_image . '" class="card-img-top" alt="' . $row['name'] . '">
                             <div class="card-body">
-                                <h5 class="card-title">' . $product['name'] . '</h5>
-                                <p class="card-text">' . $product['brand'] . '</p>
-                                <p class="card-text"><strong>$' . $product['price'] . '</strong></p>
+                                <h5 class="card-title">' . $row['name'] . '</h5>
+                                <p class="card-text">' . $row['brand'] . '</p>
+                                <p class="card-text"><strong>$' . $row['price'] . '</strong></p>
                             </div>
                         </div>
                     </div>
