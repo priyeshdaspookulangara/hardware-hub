@@ -7,9 +7,9 @@ include 'header.php';
     <h2 class="text-center mb-4">All Products</h2>
 
     <div class="row">
-        <div class_name="col-md-3">
-            <div class_name="list-group">
-                <a href="#" class_name="list-group-item list-group-item-action active" id="filter-all">All</a>
+        <div class="col-md-3">
+            <div class="list-group">
+                <a href="#" class="list-group-item list-group-item-action active" id="filter-all">All</a>
                 <?php
                 $stmt = $conn->prepare("SELECT * FROM categories");
                 $stmt->execute();
@@ -21,8 +21,8 @@ include 'header.php';
             </div>
         </div>
 
-        <div class_name="col-md-9">
-            <div class_name="row" id="product-grid">
+        <div class="col-md-9">
+            <div class="row" id="product-grid">
                 <?php
                 $stmt = $conn->prepare("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id");
                 $stmt->execute();

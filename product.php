@@ -17,6 +17,21 @@ if (!$product) {
 $images = json_decode($product['images'], true);
 $sizes = json_decode($product['sizes'], true);
 $colors = json_decode($product['colors'], true);
+
+// Fetch custom properties
+$properties = [];
+$prop_stmt = $conn->prepare("
+    SELECT cp.property_name, ppv.value
+    FROM product_property_values ppv
+    JOIN category_properties cp ON ppv.property_id = cp.id
+    WHERE ppv.product_id = ?
+");
+$prop_stmt->bind_param("i", $product_id);
+$prop_stmt->execute();
+$prop_result = $prop_stmt->get_result();
+while ($row = $prop_result->fetch_assoc()) {
+    $properties[] = $row;
+}
 ?>
 
 <div class="container mt-5">
@@ -75,6 +90,20 @@ $colors = json_decode($product['colors'], true);
                 <p><i class="fas fa-shipping-fast"></i> Free Shipping on orders over $50</p>
                 <p><i class="fas fa-undo"></i> Free 30-day returns</p>
             </div>
+
+            <?php if (!empty($properties)) { ?>
+            <div class="mt-4">
+                <h5>Specifications</h5>
+                <ul class="list-group list-group-flush">
+                    <?php foreach ($properties as $property) { ?>
+                        <li class="list-group-item d-flex justify-content-between align-items-center">
+                            <?php echo htmlspecialchars($property['property_name']); ?>
+                            <span><?php echo htmlspecialchars($property['value']); ?></span>
+                        </li>
+                    <?php } ?>
+                </ul>
+            </div>
+            <?php } ?>
         </div>
     </div>
 </div>
