@@ -1,12 +1,30 @@
 <?php
-include 'products.php';
+include 'database.php'; // Changed from products.php to database.php
 include 'header.php';
 
 $product_id = isset($_GET['id']) ? (int)$_GET['id'] : 0;
-$product = isset($products[$product_id]) ? $products[$product_id] : null;
+$product = null;
+
+if ($product_id > 0) {
+    // Sanitize the input
+    $id = mysqli_real_escape_string($link, $product_id);
+
+    // Fetch product from the database
+    $sql = "SELECT * FROM products WHERE id = '$id'";
+    $result = mysqli_query($link, $sql);
+
+    if ($result && mysqli_num_rows($result) > 0) {
+        $product = mysqli_fetch_assoc($result);
+        // Convert sizes and colors from comma-separated strings to arrays
+        $product['sizes'] = explode(',', $product['sizes']);
+        $product['colors'] = explode(',', $product['colors']);
+    }
+}
 
 if (!$product) {
     echo '<div class="container mt-5"><div class="alert alert-danger">Product not found.</div></div>';
+    // Optionally, you can include the footer and exit more gracefully
+    // include 'footer.php';
     exit;
 }
 ?>
@@ -67,6 +85,35 @@ if (!$product) {
                 <p><i class="fas fa-shipping-fast"></i> Free Shipping on orders over $50</p>
                 <p><i class="fas fa-undo"></i> Free 30-day returns</p>
             </div>
+        </div>
+    </div>
+
+    <div class="row mt-5">
+        <div class="col">
+            <h3>Product Specifications</h3>
+            <table class="table table-striped">
+                <tbody>
+                    <?php
+                    $sql_props = "
+                        SELECT cp.property_name, pp.value
+                        FROM product_properties pp
+                        JOIN category_properties cp ON pp.category_property_id = cp.id
+                        WHERE pp.product_id = '{$product['id']}'
+                    ";
+                    $result_props = mysqli_query($link, $sql_props);
+                    if ($result_props && mysqli_num_rows($result_props) > 0) {
+                        while ($row = mysqli_fetch_assoc($result_props)) {
+                            echo '<tr>';
+                            echo '<td><strong>' . htmlspecialchars($row['property_name']) . '</strong></td>';
+                            echo '<td>' . htmlspecialchars($row['value']) . '</td>';
+                            echo '</tr>';
+                        }
+                    } else {
+                        echo '<tr><td colspan="2">No additional specifications available.</td></tr>';
+                    }
+                    ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
