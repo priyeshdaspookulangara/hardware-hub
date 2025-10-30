@@ -3,11 +3,14 @@ session_start();
 // This path needs to be adjusted since it's in a subdirectory
 include_once __DIR__ . '/../../database.php';
 
-// Redirect to login if not authenticated
-// Note: We will create a login page inside /admin later
-if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
-    header("Location: ../login.php"); // Redirect to the root login page for now
-    exit;
+// Redirect to admin login if not authenticated
+if (!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin'] !== true) {
+    // A little trick to handle the case where we are already on the login page
+    // to avoid a redirect loop.
+    if (basename($_SERVER['PHP_SELF']) != 'login.php') {
+        header("Location: login.php");
+        exit;
+    }
 }
 ?>
 <!DOCTYPE html>
@@ -49,17 +52,19 @@ if (!isset($_SESSION['loggedin']) || $_SESSION['loggedin'] !== true) {
 
                 <div class="collapse navbar-collapse" id="navbarSupportedContent">
                     <ul class="navbar-nav ms-auto mt-2 mt-lg-0">
+                        <?php if (isset($_SESSION['admin_loggedin']) && $_SESSION['admin_loggedin'] === true): ?>
                         <li class="nav-item dropdown">
                             <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-bs-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-                                <i class="fas fa-user me-2"></i><?php echo htmlspecialchars($_SESSION['username']); ?>
+                                <i class="fas fa-user me-2"></i><?php echo htmlspecialchars($_SESSION['admin_username']); ?>
                             </a>
                             <div class="dropdown-menu dropdown-menu-end" aria-labelledby="navbarDropdown">
                                 <a class="dropdown-item" href="#">Profile</a>
                                 <a class="dropdown-item" href="#">Settings</a>
                                 <div class="dropdown-divider"></div>
-                                <a class="dropdown-item" href="../logout.php">Logout</a>
+                                <a class="dropdown-item" href="logout.php">Logout</a>
                             </div>
                         </li>
+                        <?php endif; ?>
                     </ul>
                 </div>
             </div>

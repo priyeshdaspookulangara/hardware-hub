@@ -8,15 +8,16 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         $username = mysqli_real_escape_string($link, $_POST['username']);
         $password = $_POST['password'];
 
-        $sql = "SELECT * FROM users WHERE username = '$username'";
+        $sql = "SELECT * FROM customers WHERE username = '$username'";
         $result = mysqli_query($link, $sql);
 
         if ($result && mysqli_num_rows($result) > 0) {
-            $user = mysqli_fetch_assoc($result);
-            if (password_verify($password, $user['password'])) {
-                $_SESSION['loggedin'] = true;
-                $_SESSION['username'] = $username;
-                header('Location: admin/dashboard.php');
+            $customer = mysqli_fetch_assoc($result);
+            if (password_verify($password, $customer['password'])) {
+                $_SESSION['customer_loggedin'] = true;
+                $_SESSION['customer_username'] = $username;
+                $_SESSION['customer_id'] = $customer['id'];
+                header('Location: index.php'); // Redirect to homepage after login
                 exit;
             } else {
                 $error = "Invalid username or password.";
@@ -36,7 +37,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Login</title>
+    <title>Customer Login</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 </head>
 <body>
@@ -44,7 +45,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         <div class="row justify-content-center">
             <div class="col-md-6">
                 <div class="card">
-                    <div class="card-header">Admin Login</div>
+                    <div class="card-header">Customer Login</div>
                     <div class="card-body">
                         <?php if (!empty($error)): ?>
                             <div class="alert alert-danger"><?php echo $error; ?></div>
@@ -60,6 +61,9 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                             </div>
                             <button type="submit" class="btn btn-primary">Login</button>
                         </form>
+                        <div class="mt-3 text-center">
+                            <p>Don't have an account? <a href="register.php">Register here</a></p>
+                        </div>
                     </div>
                 </div>
             </div>

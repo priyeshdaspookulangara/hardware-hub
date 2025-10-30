@@ -25,11 +25,20 @@ CREATE TABLE IF NOT EXISTS products (
     FOREIGN KEY (category_id) REFERENCES categories(id)
 )";
 
-// SQL to create users table
-$sql_create_users_table = "
-CREATE TABLE IF NOT EXISTS users (
+// SQL to create admins table
+$sql_create_admins_table = "
+CREATE TABLE IF NOT EXISTS admins (
     id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
     username VARCHAR(50) NOT NULL UNIQUE,
+    password VARCHAR(255) NOT NULL
+)";
+
+// SQL to create customers table
+$sql_create_customers_table = "
+CREATE TABLE IF NOT EXISTS customers (
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(50) NOT NULL UNIQUE,
+    email VARCHAR(255) NOT NULL UNIQUE,
     password VARCHAR(255) NOT NULL
 )";
 
@@ -84,11 +93,35 @@ if (mysqli_query($link, $sql_alter_products_colors)) {
     echo "ERROR: Could not able to execute $sql_alter_products_colors. " . mysqli_error($link) . "\n";
 }
 
-if (mysqli_query($link, $sql_create_users_table)) {
-    echo "Table 'users' created successfully.\n";
+// Rename users to admins if it exists
+$result = mysqli_query($link, "SHOW TABLES LIKE 'users'");
+if ($result && mysqli_num_rows($result) > 0) {
+    if (mysqli_query($link, "RENAME TABLE users TO admins")) {
+        echo "Table 'users' renamed to 'admins' successfully.\n";
+    } else {
+        echo "ERROR: Could not rename table 'users' to 'admins'. " . mysqli_error($link) . "\n";
+    }
 } else {
-    echo "ERROR: Could not able to execute $sql_create_users_table. " . mysqli_error($link) . "\n";
+    // Check if the query itself failed
+    if (!$result) {
+        echo "ERROR: Could not check if 'users' table exists. " . mysqli_error($link) . "\n";
+    } else {
+        echo "Table 'users' not found, skipping rename.\n";
+    }
 }
+
+if (mysqli_query($link, $sql_create_admins_table)) {
+    echo "Table 'admins' created successfully.\n";
+} else {
+    echo "ERROR: Could not able to execute $sql_create_admins_table. " . mysqli_error($link) . "\n";
+}
+
+if (mysqli_query($link, $sql_create_customers_table)) {
+    echo "Table 'customers' created successfully.\n";
+} else {
+    echo "ERROR: Could not able to execute $sql_create_customers_table. " . mysqli_error($link) . "\n";
+}
+
 
 if (mysqli_query($link, $sql_create_category_properties_table)) {
     echo "Table 'category_properties' created successfully.\n";
@@ -147,20 +180,23 @@ if (file_exists('products.json')) {
 }
 
 
-// Populate users table with a default admin user if it doesn't exist
+// Populate admins table with a default admin user if it doesn't exist
 $username = 'admin';
-$result = mysqli_query($link, "SELECT id FROM users WHERE username = '$username'");
-if (mysqli_num_rows($result) == 0) {
+$result = mysqli_query($link, "SELECT id FROM admins WHERE username = '$username'");
+if ($result && mysqli_num_rows($result) == 0) {
     $password = password_hash('admin', PASSWORD_DEFAULT);
-    $sql_insert_user = "INSERT INTO users (username, password) VALUES ('$username', '$password')";
+    $sql_insert_admin = "INSERT INTO admins (username, password) VALUES ('$username', '$password')";
 
-    if (mysqli_query($link, $sql_insert_user)) {
-        echo "User 'admin' inserted successfully.\n";
+    if (mysqli_query($link, $sql_insert_admin)) {
+        echo "Admin 'admin' inserted successfully.\n";
     } else {
-        echo "ERROR: Could not able to execute $sql_insert_user. " . mysqli_error($link) . "\n";
+        echo "ERROR: Could not able to execute $sql_insert_admin. " . mysqli_error($link) . "\n";
     }
-} else {
-    echo "User 'admin' already exists. Skipping insertion.\n";
+} else if (!$result) {
+    echo "ERROR: Could not check for admin user. " . mysqli_error($link) . "\n";
+}
+else {
+    echo "Admin 'admin' already exists. Skipping insertion.\n";
 }
 
 // Close connection
