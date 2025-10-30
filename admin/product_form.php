@@ -146,11 +146,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_product'])) {
             <div class="row">
                 <div class="col-md-6 mb-3">
                     <label for="sizes" class="form-label">Sizes (comma-separated)</label>
-                    <input type="text" class="form-control" id="sizes" name="sizes" required value="<?php echo htmlspecialchars($product['sizes'] ?? ''); ?>">
+                    <input type="text" class="form-control" id="sizes" name="sizes" value="<?php echo htmlspecialchars($product['sizes'] ?? ''); ?>">
                 </div>
                 <div class="col-md-6 mb-3">
                     <label for="colors" class="form-label">Colors (comma-separated)</label>
-                    <input type="text" class="form-control" id="colors" name="colors" required value="<?php echo htmlspecialchars($product['colors'] ?? ''); ?>">
+                    <input type="text" class="form-control" id="colors" name="colors" value="<?php echo htmlspecialchars($product['colors'] ?? ''); ?>">
                 </div>
             </div>
 

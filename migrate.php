@@ -20,8 +20,8 @@ CREATE TABLE IF NOT EXISTS products (
     image VARCHAR(255) NOT NULL,
     category_id INT(11) UNSIGNED NOT NULL,
     description TEXT NOT NULL,
-    sizes VARCHAR(255) NOT NULL,
-    colors VARCHAR(255) NOT NULL,
+    sizes VARCHAR(255) NULL,
+    colors VARCHAR(255) NULL,
     FOREIGN KEY (category_id) REFERENCES categories(id)
 )";
 
@@ -66,6 +66,22 @@ if (mysqli_query($link, $sql_create_products_table)) {
     echo "Table 'products' created successfully.\n";
 } else {
     echo "ERROR: Could not able to execute $sql_create_products_table. " . mysqli_error($link) . "\n";
+}
+
+// SQL to alter products table to make sizes and colors nullable
+$sql_alter_products_sizes = "ALTER TABLE products MODIFY sizes VARCHAR(255) NULL";
+$sql_alter_products_colors = "ALTER TABLE products MODIFY colors VARCHAR(255) NULL";
+
+if (mysqli_query($link, $sql_alter_products_sizes)) {
+    echo "Table 'products' modified successfully: sizes is now nullable.\n";
+} else {
+    echo "ERROR: Could not able to execute $sql_alter_products_sizes. " . mysqli_error($link) . "\n";
+}
+
+if (mysqli_query($link, $sql_alter_products_colors)) {
+    echo "Table 'products' modified successfully: colors is now nullable.\n";
+} else {
+    echo "ERROR: Could not able to execute $sql_alter_products_colors. " . mysqli_error($link) . "\n";
 }
 
 if (mysqli_query($link, $sql_create_users_table)) {
