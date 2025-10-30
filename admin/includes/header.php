@@ -38,8 +38,8 @@ if (!isset($_SESSION['admin_loggedin']) || $_SESSION['admin_loggedin'] !== true)
             <a href="category_properties.php" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-cogs me-2"></i>Category Properties</a>
             <a href="products.php" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-box me-2"></i>Products</a>
             <a href="orders.php" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-shopping-cart me-2"></i>Orders</a>
-            <a href="#" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-users me-2"></i>Customers</a>
-            <a href="#" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-cog me-2"></i>Settings</a>
+            <a href="customers.php" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-users me-2"></i>Customers</a>
+            <a href="settings.php" class="list-group-item list-group-item-action bg-dark text-white"><i class="fas fa-cog me-2"></i>Settings</a>
         </div>
     </div>
     <!-- /#sidebar-wrapper -->
