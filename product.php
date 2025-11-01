@@ -51,7 +51,7 @@ while ($row = $prop_result->fetch_assoc()) {
             <h2><?php echo $product['name']; ?></h2>
             <p class="text-muted"><?php echo $product['brand']; ?></p>
             <h3>
-                <strong>$<?php echo $product['price']; ?></strong>
+                <strong>$<?php echo getProductPrice($conn, $product['id'], $product['price'], $product['category_id']); ?></strong>
                 <s class="text-muted">$<?php echo $product['original_price']; ?></s>
             </h3>
             <div class="d-flex align-items-center mb-3">

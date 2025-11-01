@@ -38,7 +38,7 @@ include 'header.php';
                             <div class="card-body">
                                 <h5 class="card-title">' . $row['name'] . '</h5>
                                 <p class="card-text">' . $row['brand'] . '</p>
-                                <p class="card-text"><strong>$' . $row['price'] . '</strong> <s class="text-muted">$' . $row['original_price'] . '</s></p>
+                                <p class="card-text"><strong>$' . getProductPrice($conn, $row['id'], $row['price'], $row['category_id']) . '</strong> <s class="text-muted">$' . $row['original_price'] . '</s></p>
                                 <a href="product.php?id=' . $row['id'] . '" class="btn btn-primary">View Details</a>
                             </div>
                         </div>

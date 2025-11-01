@@ -44,6 +44,13 @@ while ($row = $result->fetch_assoc()) {
 <div class="container mt-5">
     <h2 class="mb-4">Manage Products</h2>
 
+    <?php if (isset($_GET['error'])): ?>
+        <div class="alert alert-danger"><?php echo htmlspecialchars($_GET['error']); ?></div>
+    <?php endif; ?>
+    <?php if (isset($_GET['success'])): ?>
+        <div class="alert alert-success">Featured product updated successfully.</div>
+    <?php endif; ?>
+
     <div class="card">
         <div class="card-header">
             <h3>Add New Product</h3>
