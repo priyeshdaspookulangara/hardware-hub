@@ -11,21 +11,44 @@ $cart_items = [];
 $subtotal = 0;
 
 if (!empty($_SESSION['cart'])) {
-    // Get product details for items in cart
-    $product_ids = array_keys($_SESSION['cart']);
-    $stmt = $conn->prepare("SELECT * FROM products WHERE id IN (" . implode(',', array_fill(0, count($product_ids), '?')) . ")");
-    $stmt->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
-    $stmt->execute();
-    $result = $stmt->get_result();
+    // Extract product IDs from the composite keys in the cart
+    $product_ids = [];
+    foreach ($_SESSION['cart'] as $cart_item_key => $item) {
+        $product_ids[] = $item['product_id'];
+    }
+    $product_ids = array_unique($product_ids);
 
-    while ($product = $result->fetch_assoc()) {
-        $product_id = $product['id'];
-        $quantity = $_SESSION['cart'][$product_id]['quantity'];
-        // Use the original price for cart calculations before non-coupon discounts
-        $price = $product['price'];
+    // Fetch all relevant products in a single query
+    $products_by_id = [];
+    if (!empty($product_ids)) {
+        $stmt = $conn->prepare("SELECT * FROM products WHERE id IN (" . implode(',', array_fill(0, count($product_ids), '?')) . ")");
+        $stmt->bind_param(str_repeat('i', count($product_ids)), ...$product_ids);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        while ($product = $result->fetch_assoc()) {
+            $products_by_id[$product['id']] = $product;
+        }
+    }
 
-        $cart_items[] = [
-            'id' => $product_id,
+    // Build the cart items array
+    foreach ($_SESSION['cart'] as $cart_item_key => $item) {
+        $product = $products_by_id[$item['product_id']] ?? null;
+        if ($product) {
+            $cart_items[] = [
+                'id' => $item['product_id'],
+                'name' => $product['name'],
+                'price' => $product['price'],
+                'original_price' => $product['original_price'],
+                'quantity' => $item['quantity'],
+                'category_id' => $product['category_id'],
+                'image' => json_decode($product['images'], true)[0] ?? 'https://via.placeholder.com/150',
+                'size' => $item['size'],
+                'color' => $item['color']
+            ];
+            $subtotal += $product['price'] * $item['quantity'];
+        }
+    }
+}
             'name' => $product['name'],
             'price' => $price,
             'original_price' => $product['original_price'],
@@ -62,24 +85,26 @@ if (isset($_SESSION['coupon'])) {
             $discount += $total * ($coupon['discount_value'] / 100);
         } elseif ($coupon['offer_type'] === 'fixed_amount') {
             $discount += $coupon['discount_value'];
-        }
-    } elseif ($coupon['scope'] === 'category') {
-        foreach ($cart_items as $item) {
-            if ($item['category_id'] == $coupon['applicable_id']) {
-                if ($coupon['offer_type'] === 'percentage') {
-                    $discount += ($item['final_price'] * $item['quantity']) * ($coupon['discount_value'] / 100);
-                } elseif ($coupon['offer_type'] === 'fixed_amount') {
-                    $discount += $coupon['discount_value'];
-                }
+            // Prevent discount from exceeding total
+            if ($discount > $total) {
+                $discount = $total;
             }
         }
-    } elseif ($coupon['scope'] === 'product') {
-         foreach ($cart_items as $item) {
-            if ($item['id'] == $coupon['applicable_id']) {
+    } else { // Category or Product scope
+        $applied_to_items = 0;
+        foreach ($cart_items as $item) {
+            $is_applicable = ($coupon['scope'] === 'category' && $item['category_id'] == $coupon['applicable_id']) ||
+                             ($coupon['scope'] === 'product' && $item['id'] == $coupon['applicable_id']);
+
+            if ($is_applicable) {
                 if ($coupon['offer_type'] === 'percentage') {
                     $discount += ($item['final_price'] * $item['quantity']) * ($coupon['discount_value'] / 100);
                 } elseif ($coupon['offer_type'] === 'fixed_amount') {
-                    $discount += $coupon['discount_value'];
+                    // Apply fixed amount discount only once for the first matching item found
+                    if ($applied_to_items === 0) {
+                        $discount += $coupon['discount_value'];
+                        $applied_to_items++;
+                    }
                 }
             }
         }
