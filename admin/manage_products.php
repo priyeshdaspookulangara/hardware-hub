@@ -107,6 +107,48 @@ while ($row = $result->fetch_assoc()) {
     </div>
 </div>
 
+<!-- Existing Products List -->
+<div class="card mt-5">
+    <div class="card-header">
+        <h3>Existing Products</h3>
+    </div>
+    <div class="card-body">
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Category</th>
+                    <th>Featured</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                // Fetch products with their category names
+                $products_result = $conn->query("
+                    SELECT p.id, p.name, p.category_id, p.is_featured, c.name AS category_name
+                    FROM products p
+                    JOIN categories c ON p.category_id = c.id
+                    ORDER BY c.name, p.name
+                ");
+                while ($product = $products_result->fetch_assoc()) {
+                    echo "<tr>";
+                    echo "<td>" . htmlspecialchars($product['name']) . "</td>";
+                    echo "<td>" . htmlspecialchars($product['category_name']) . "</td>";
+                    echo "<td>" . ($product['is_featured'] ? '<span class="badge bg-success">Yes</span>' : 'No') . "</td>";
+                    echo "<td>";
+                    if (!$product['is_featured']) {
+                        echo "<a href='set_featured_product.php?product_id=" . $product['id'] . "&category_id=" . $product['category_id'] . "' class='btn btn-sm btn-primary'>Set as Featured</a>";
+                    }
+                    echo "</td>";
+                    echo "</tr>";
+                }
+                ?>
+            </tbody>
+        </table>
+    </div>
+</div>
+
 <script>
 $(document).ready(function() {
     $('#category_id').on('change', function() {

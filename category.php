@@ -22,6 +22,7 @@ include 'header.php';
         </div>
 
         <div class="col-md-9">
+            <div id="featured-product-container"></div>
             <div class="row" id="product-grid">
                 <?php
                 $stmt = $conn->prepare("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id");
@@ -59,10 +60,24 @@ $(document).ready(function() {
         $(this).addClass('active');
 
         var category = $(this).data('category');
+        $('#featured-product-container').empty(); // Clear previous featured product
 
         if (category) {
             $('.product-item').hide();
             $('.product-item[data-category="' + category + '"]').show();
+
+            // Fetch and display the featured product for this category
+            $.ajax({
+                url: 'get_featured_product.php',
+                type: 'GET',
+                data: { category_name: category },
+                success: function(response) {
+                    if (response) {
+                        $('#featured-product-container').html(response);
+                    }
+                }
+            });
+
         } else {
             $('.product-item').show();
         }
@@ -73,6 +88,7 @@ $(document).ready(function() {
         $('.list-group-item').removeClass('active');
         $(this).addClass('active');
         $('.product-item').show();
+        $('#featured-product-container').empty();
     });
 });
 </script>
