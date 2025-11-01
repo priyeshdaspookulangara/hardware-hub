@@ -1,0 +1,13 @@
+ALTER TABLE products
+ADD COLUMN release_date DATE,
+ADD COLUMN units_sold_last_30_days INT DEFAULT 0,
+ADD COLUMN inventory_level INT DEFAULT 0,
+ADD COLUMN profit_margin DECIMAL(5, 2) DEFAULT 0.00;
+
+CREATE TABLE product_labels (
+    id INT(11) UNSIGNED AUTO_INCREMENT PRIMARY KEY,
+    product_id INT(11) UNSIGNED NOT NULL,
+    label_name VARCHAR(255) NOT NULL,
+    assigned_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (product_id) REFERENCES products(id) ON DELETE CASCADE
+);
