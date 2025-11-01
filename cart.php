@@ -49,9 +49,6 @@ if (!empty($_SESSION['cart'])) {
         }
     }
 }
-            'name' => $product['name'],
-            'price' => $price,
-            'original_price' => $product['original_price'],
             'quantity' => $quantity,
             'category_id' => $product['category_id'],
             'image' => json_decode($product['images'], true)[0] ?? 'https://via.placeholder.com/150'
