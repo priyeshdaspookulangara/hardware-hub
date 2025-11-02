@@ -1,26 +1,38 @@
 <?php
-session_start();
+include 'db_connect.php';
 
-if (!isset($_SESSION['cart'])) {
-    $_SESSION['cart'] = [];
-}
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['product_id'])) {
+    $productId = intval($_POST['product_id']);
+    $size = isset($_POST['size']) ? $_POST['size'] : null;
+    $color = isset($_POST['color']) ? $_POST['color'] : null;
 
-if (isset($_POST['product_id']) && isset($_POST['size']) && isset($_POST['color'])) {
-    $productId = $_POST['product_id'];
-    $size = $_POST['size'];
-    $color = $_POST['color'];
+    // Initialize cart if not set
+    if (!isset($_SESSION['cart'])) {
+        $_SESSION['cart'] = [];
+    }
 
-    $cartItem = [
-        'product_id' => $productId,
-        'size' => $size,
-        'color' => $color,
-        'quantity' => 1 // Default quantity to 1
-    ];
+    // Create a unique key for the product based on id, size, and color
+    $cart_item_key = $productId . '_' . $size . '_' . $color;
 
-    // For simplicity, we'll just add the item. A real application would check for duplicates and update quantity.
-    $_SESSION['cart'][] = $cartItem;
+    // Add product to cart or update quantity
+    if (isset($_SESSION['cart'][$cart_item_key])) {
+        $_SESSION['cart'][$cart_item_key]['quantity']++;
+    } else {
+        $_SESSION['cart'][$cart_item_key] = [
+            'product_id' => $productId,
+            'quantity' => 1,
+            'size' => $size,
+            'color' => $color
+        ];
+    }
 
-    echo json_encode(['success' => true, 'cart_count' => count($_SESSION['cart'])]);
+    // Return success response with cart count
+    echo json_encode([
+        'success' => true,
+        'cart_count' => count($_SESSION['cart'])
+    ]);
 } else {
+    // Return error response
     echo json_encode(['success' => false]);
 }
+?>

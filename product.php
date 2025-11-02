@@ -14,7 +14,19 @@ if (!$product) {
     exit;
 }
 
-$images = json_decode($product['images'], true);
+// Fetch product images from the new table
+$images = [];
+$image_stmt = $conn->prepare("SELECT image_path FROM product_images WHERE product_id = ? ORDER BY sort_order ASC");
+$image_stmt->bind_param("i", $product_id);
+$image_stmt->execute();
+$image_result = $image_stmt->get_result();
+while ($row = $image_result->fetch_assoc()) {
+    $images[] = $row['image_path'];
+}
+if (empty($images)) {
+    $images[] = 'https://via.placeholder.com/500'; // Default image
+}
+
 $sizes = json_decode($product['sizes'], true);
 $colors = json_decode($product['colors'], true);
 
@@ -51,7 +63,7 @@ while ($row = $prop_result->fetch_assoc()) {
             <h2><?php echo $product['name']; ?></h2>
             <p class="text-muted"><?php echo $product['brand']; ?></p>
             <h3>
-                <strong>$<?php echo $product['price']; ?></strong>
+                <strong>$<?php echo getProductPrice($conn, $product['id'], $product['price'], $product['category_id']); ?></strong>
                 <s class="text-muted">$<?php echo $product['original_price']; ?></s>
             </h3>
             <div class="d-flex align-items-center mb-3">

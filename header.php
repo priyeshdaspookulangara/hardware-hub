@@ -47,7 +47,7 @@
                     <a class="nav-link" href="#"><i class="fas fa-heart"></i> <span class="badge bg-danger">3</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart"></i> <span class="badge bg-success"></span></a>
+                    <a class="nav-link" href="cart.php"><i class="fas fa-shopping-cart"></i> <span class="badge bg-success"><?php echo isset($_SESSION['cart']) ? count($_SESSION['cart']) : 0; ?></span></a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#"><i class="fas fa-user"></i></a>
