@@ -43,13 +43,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_product'])) {
     $description = mysqli_real_escape_string($link, $_POST['description']);
     $sizes = mysqli_real_escape_string($link, $_POST['sizes']);
     $colors = mysqli_real_escape_string($link, $_POST['colors']);
+    $is_featured = isset($_POST['is_featured']) ? 1 : 0;
+    $cod_available = isset($_POST['cod_available']) ? 1 : 0;
 
     if ($edit_mode) {
         // UPDATE query
-        $sql_save = "UPDATE products SET name='$name', brand='$brand', category_id='$category_id', price='$price', original_price='$original_price', image='$image', description='$description', sizes='$sizes', colors='$colors' WHERE id='$product_id'";
+        $sql_save = "UPDATE products SET name='$name', brand='$brand', category_id='$category_id', price='$price', original_price='$original_price', image='$image', description='$description', sizes='$sizes', colors='$colors', is_featured='$is_featured', cod_available='$cod_available' WHERE id='$product_id'";
     } else {
         // INSERT query
-        $sql_save = "INSERT INTO products (name, brand, category_id, price, original_price, image, description, sizes, colors) VALUES ('$name', '$brand', '$category_id', '$price', '$original_price', '$image', '$description', '$sizes', '$colors')";
+        $sql_save = "INSERT INTO products (name, brand, category_id, price, original_price, image, description, sizes, colors, is_featured, cod_available) VALUES ('$name', '$brand', '$category_id', '$price', '$original_price', '$image', '$description', '$sizes', '$colors', '$is_featured', '$cod_available')";
     }
 
     if (mysqli_query($link, $sql_save)) {
@@ -151,6 +153,25 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_product'])) {
                 <div class="col-md-6 mb-3">
                     <label for="colors" class="form-label">Colors (comma-separated)</label>
                     <input type="text" class="form-control" id="colors" name="colors" value="<?php echo htmlspecialchars($product['colors'] ?? ''); ?>">
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="1" id="is_featured" name="is_featured" <?php echo (isset($product['is_featured']) && $product['is_featured']) ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="is_featured">
+                            Set as featured
+                        </label>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="1" id="cod_available" name="cod_available" <?php echo (isset($product['cod_available']) && $product['cod_available']) ? 'checked' : ''; ?>>
+                        <label class="form-check-label" for="cod_available">
+                            Cash on Delivery
+                        </label>
+                    </div>
                 </div>
             </div>
 

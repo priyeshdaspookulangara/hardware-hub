@@ -80,6 +80,8 @@ if (mysqli_query($link, $sql_create_products_table)) {
 // SQL to alter products table to make sizes and colors nullable
 $sql_alter_products_sizes = "ALTER TABLE products MODIFY sizes VARCHAR(255) NULL";
 $sql_alter_products_colors = "ALTER TABLE products MODIFY colors VARCHAR(255) NULL";
+$sql_alter_products_featured = "ALTER TABLE products ADD COLUMN is_featured TINYINT(1) NOT NULL DEFAULT 0";
+$sql_alter_products_cod = "ALTER TABLE products ADD COLUMN cod_available TINYINT(1) NOT NULL DEFAULT 0";
 
 if (mysqli_query($link, $sql_alter_products_sizes)) {
     echo "Table 'products' modified successfully: sizes is now nullable.\n";
@@ -91,6 +93,18 @@ if (mysqli_query($link, $sql_alter_products_colors)) {
     echo "Table 'products' modified successfully: colors is now nullable.\n";
 } else {
     echo "ERROR: Could not able to execute $sql_alter_products_colors. " . mysqli_error($link) . "\n";
+}
+
+if (mysqli_query($link, $sql_alter_products_featured)) {
+    echo "Table 'products' modified successfully: is_featured added.\n";
+} else {
+    echo "ERROR: Could not able to execute $sql_alter_products_featured. " . mysqli_error($link) . "\n";
+}
+
+if (mysqli_query($link, $sql_alter_products_cod)) {
+    echo "Table 'products' modified successfully: cod_available added.\n";
+} else {
+    echo "ERROR: Could not able to execute $sql_alter_products_cod. " . mysqli_error($link) . "\n";
 }
 
 // Rename users to admins if it exists
