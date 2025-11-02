@@ -25,12 +25,17 @@ include 'header.php';
             <div id="featured-product-container"></div>
             <div class="row" id="product-grid">
                 <?php
-                $stmt = $conn->prepare("SELECT p.*, c.name as category_name FROM products p JOIN categories c ON p.category_id = c.id");
+                $stmt = $conn->prepare("
+                    SELECT p.*, c.name as category_name, MIN(pi.image_path) as first_image
+                    FROM products p
+                    JOIN categories c ON p.category_id = c.id
+                    LEFT JOIN product_images pi ON p.id = pi.product_id
+                    GROUP BY p.id
+                ");
                 $stmt->execute();
                 $result = $stmt->get_result();
                 while ($row = $result->fetch_assoc()) {
-                    $images = json_decode($row['images'], true);
-                    $first_image = !empty($images) ? $images[0] : 'https://via.placeholder.com/300';
+                    $first_image = $row['first_image'] ?? 'https://via.placeholder.com/300';
                     echo '
                     <div class="col-md-4 mb-4 product-item" data-category="' . $row['category_name'] . '">
                         <div class="card">

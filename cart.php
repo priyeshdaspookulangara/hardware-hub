@@ -49,13 +49,6 @@ if (!empty($_SESSION['cart'])) {
         }
     }
 }
-            'quantity' => $quantity,
-            'category_id' => $product['category_id'],
-            'image' => json_decode($product['images'], true)[0] ?? 'https://via.placeholder.com/150'
-        ];
-        $subtotal += $price * $quantity;
-    }
-}
 
 // Apply discounts
 $discount = 0;
