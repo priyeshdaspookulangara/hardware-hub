@@ -14,7 +14,25 @@ if (!$product) {
     exit;
 }
 
-$images = json_decode($product['images'], true);
+// Fetch product images from the new table
+$image_stmt = $conn->prepare("SELECT image_path, is_primary FROM product_images WHERE product_id = ? ORDER BY is_primary DESC");
+$image_stmt->bind_param("i", $product_id);
+$image_stmt->execute();
+$image_result = $image_stmt->get_result();
+$images = [];
+$primary_image = 'placeholder.jpg'; // Default image
+while ($row = $image_result->fetch_assoc()) {
+    $images[] = $row['image_path'];
+    if ($row['is_primary']) {
+        $primary_image = $row['image_path'];
+    }
+}
+// If no primary is set, use the first image
+if (empty($primary_image) && !empty($images)) {
+    $primary_image = $images[0];
+}
+
+
 $sizes = json_decode($product['sizes'], true);
 $colors = json_decode($product['colors'], true);
 
@@ -38,12 +56,12 @@ while ($row = $prop_result->fetch_assoc()) {
     <div class="row">
         <div class="col-md-6">
             <div class="position-relative">
-                <img src="<?php echo $images[0]; ?>" class="img-fluid" id="main-product-image" alt="<?php echo $product['name']; ?>">
+                <img src="<?php echo $primary_image; ?>" class="img-fluid" id="main-product-image" alt="<?php echo $product['name']; ?>">
                 <span class="badge bg-primary position-absolute top-0 start-0 m-3">New Arrival</span>
             </div>
             <div class="text-center mt-3">
-                <?php foreach ($images as $index => $image) {
-                    echo '<span class="dot' . ($index == 0 ? ' active' : '') . '" data-image="' . $image . '"></span>';
+                <?php foreach ($images as $image) {
+                    echo '<img src="' . $image . '" class="img-thumbnail" style="width: 60px; height: 60px; cursor: pointer;" onclick="document.getElementById(\'main-product-image\').src=\'' . $image . '\'">';
                 } ?>
             </div>
         </div>
