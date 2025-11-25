@@ -57,11 +57,43 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['save_product'])) {
     }
 }
 
+// Handle product deletion
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['delete_product'])) {
+    $productId = $_POST['product_id'];
+
+    // First, delete the image files from the server
+    $stmt = $conn->prepare("SELECT image_path FROM product_images WHERE product_id = ?");
+    $stmt->bind_param("i", $productId);
+    $stmt->execute();
+    $result = $stmt->get_result();
+    while ($row = $result->fetch_assoc()) {
+        $imagePath = '../' . $row['image_path'];
+        if (file_exists($imagePath)) {
+            unlink($imagePath);
+        }
+    }
+
+    // Then, delete the records from the database
+    $stmt = $conn->prepare("DELETE FROM products WHERE id = ?");
+    $stmt->bind_param("i", $productId);
+    $stmt->execute();
+
+    // The database schema should be set up with ON DELETE CASCADE for product_images and product_property_values,
+    // so they will be deleted automatically.
+}
+
 // Fetch categories for the dropdown
 $categories = [];
 $result = $conn->query("SELECT * FROM categories");
 while ($row = $result->fetch_assoc()) {
     $categories[] = $row;
+}
+
+// Fetch all products for the list
+$products = [];
+$product_result = $conn->query("SELECT id, name, brand, price FROM products ORDER BY name ASC");
+while ($row = $product_result->fetch_assoc()) {
+    $products[] = $row;
 }
 ?>
 
@@ -129,6 +161,39 @@ while ($row = $result->fetch_assoc()) {
 
                 <button type="submit" name="save_product" class="btn btn-primary">Save Product</button>
             </form>
+        </div>
+    </div>
+
+    <div class="card mt-5">
+        <div class="card-header">
+            <h3>Existing Products</h3>
+        </div>
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Brand</th>
+                        <th>Price</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <?php foreach ($products as $product) { ?>
+                        <tr>
+                            <td><?php echo htmlspecialchars($product['name']); ?></td>
+                            <td><?php echo htmlspecialchars($product['brand']); ?></td>
+                            <td>$<?php echo htmlspecialchars($product['price']); ?></td>
+                            <td>
+                                <form action="manage_products.php" method="post" onsubmit="return confirm('Are you sure you want to delete this product?');">
+                                    <input type="hidden" name="product_id" value="<?php echo $product['id']; ?>">
+                                    <button type="submit" name="delete_product" class="btn btn-danger btn-sm">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    <?php } ?>
+                </tbody>
+            </table>
         </div>
     </div>
 </div>
